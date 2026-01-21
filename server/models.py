@@ -44,7 +44,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    minutes_to_complete = db.Column(db.Integer)
+    time = db.Column(db.Integer)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates="tasks")
 
@@ -72,6 +72,6 @@ class TaskSchema(Schema):
         required=True,
         validate=validate.Length(min=50, error="Description must be at least 50 characters long.")
     )
-    minutes_to_complete = fields.Int()
+    time = fields.Int()
     user_id = fields.Int()
     user = fields.Nested(UserSchema(exclude=("tasks",)))
