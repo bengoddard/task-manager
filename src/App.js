@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "./NavBar";
-import Login from "../pages/Login";
-import HabitForm from "./HabitForm";
-import { Button } from "../styles";
+import NavBar from "./components/NavBar";
+import Login from "./pages/Login";
+import HabitForm from "./components/HabitForm";
+import { Button } from "./styles";
 
 function App() {
   const [user, setUser] = useState(null);

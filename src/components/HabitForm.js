@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import { Button, Error, Input, FormField, Label } from "../styles";
 
 function HabitForm({ token, onHabitCreated }) {
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
   const [frequency, setFrequency] = useState("daily");
-  const [goal, setGoal] = useState(1);
   const [notes, setNotes] = useState("");
-
   const [errors, setErrors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,7 +22,6 @@ function HabitForm({ token, onHabitCreated }) {
       body: JSON.stringify({
         title,
         frequency,
-        goal: Number(goal),
         notes,
       }),
     }).then((r) => {
@@ -33,9 +30,8 @@ function HabitForm({ token, onHabitCreated }) {
         r.json().then((newHabit) => {
           if (onHabitCreated) onHabitCreated(newHabit);
 
-          setName("");
+          setTitle("");
           setFrequency("daily");
-          setGoal(1);
           setNotes("");
         });
       } else {
@@ -52,8 +48,8 @@ function HabitForm({ token, onHabitCreated }) {
           type="text"
           id="title"
           autoComplete="off"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g., Drink water"
         />
       </FormField>
@@ -73,19 +69,7 @@ function HabitForm({ token, onHabitCreated }) {
       </FormField>
 
       <FormField>
-        <Label htmlFor="goal">Goal</Label>
-        <Input
-          type="number"
-          id="goal"
-          min="1"
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
-          placeholder="e.g., 1"
-        />
-      </FormField>
-
-      <FormField>
-        <Label htmlFor="notes">Notes (optional)</Label>
+        <Label htmlFor="notes">Notes</Label>
         <Input
           type="text"
           id="notes"
