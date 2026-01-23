@@ -10,15 +10,13 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
     _password_hash = db.Column(db.String)
-    bio = db.Column(db.String)
 
-    tasks = db.relationship('Task', back_populates='user')
+    habits = db.relationship('Habit', back_populates='user')
 
     def to_dict(self):
         return {
             "id": self.id,
             "username": self.username,
-            "bio": self.bio
         }
 
     @hybrid_property
@@ -39,14 +37,14 @@ class User(db.Model):
         return f'<User {self.username}>'
 
 
-class Task(db.Model):
-    __tablename__ = 'tasks'
+class Habit(db.Model):
+    __tablename__ = 'habits'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     time = db.Column(db.Integer)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-    user = db.relationship('User', back_populates="tasks")
+    user = db.relationship('User', back_populates="habits")
 
     @validates('description')
     def validate_instructions(self, key, description):
@@ -60,12 +58,11 @@ class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     username = fields.Str(required=True)
     password = fields.Str(load_only=True, required=True)
-    bio = fields.Str()
 
-    tasks = fields.List(fields.Nested(lambda: TaskSchema(exclude=("user",))))
+    habits = fields.List(fields.Nested(lambda: HabitSchema(exclude=("user",))))
 
 
-class TaskSchema(Schema):
+class HabitSchema(Schema):
     id = fields.Int(dump_only=True)
     title = fields.Str(required=True)
     description = fields.Str(
@@ -74,4 +71,4 @@ class TaskSchema(Schema):
     )
     time = fields.Int()
     user_id = fields.Int()
-    user = fields.Nested(UserSchema(exclude=("tasks",)))
+    user = fields.Nested(UserSchema(exclude=("habits",)))

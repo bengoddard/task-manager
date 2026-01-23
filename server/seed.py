@@ -5,14 +5,14 @@ from random import randint, choice as rc
 from faker import Faker
 
 from app import app
-from models import db, Task, User
+from models import db, Habit, User
 
 fake = Faker()
 
 with app.app_context():
 
     print("Deleting all records...")
-    Task.query.delete()
+    Habit.query.delete()
     User.query.delete()
 
     fake = Faker()
@@ -30,7 +30,6 @@ with app.app_context():
 
         user = User(
             username=username,
-            bio=fake.paragraph(nb_sentences=3),
         )
 
         user.password_hash = user.username + 'password'
@@ -39,22 +38,27 @@ with app.app_context():
 
     db.session.add_all(users)
 
-    print("Creating notes...")
-    tasks = []
-    for i in range(100):
-        description = fake.paragraph(nb_sentences=8)
-        time = fake.number.int({ min: 10, max: 100 })
-        task = Task(
-            title=fake.sentence(),
-            description=description,
-            time=time,
-            user=rc(users)
-        )
+    print("Creating habits...")
+    habits = []
+    habit_titles = [
+        "Morning Meditation", "Daily Journaling", "Exercise Routine",
+        "Read 30 Minutes", "No Social Media Before Bed"
+    ]
+    for user in users:
+        for _ in range(4):
+            description = fake.paragraph(nb_sentences=8)
+            time = fake.random_int(min=5, max=60)
+            habit = Habit(
+                title=rc(habit_titles),
+                description=description,
+                time=time,
+                user=rc(users)
+            )
 
-        task.user = rc(users)
+            habit.user = rc(users)
 
-        tasks.append(task)
+            habits.append(habit)
 
-    db.session.add_all(tasks)
+    db.session.add_all(habits)
     db.session.commit()
     print("Complete.")

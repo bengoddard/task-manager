@@ -2,7 +2,7 @@ from flask import request, session, make_response, jsonify
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from config import app, db, api, jwt
-from models import User, Task, UserSchema, TaskSchema
+from models import User, Habit, UserSchema, HabitSchema
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request
 
 @app.before_request
@@ -58,14 +58,14 @@ class Login(Resource):
 
         return {'error': '401 Unauthorized'}, 401
 
-class TaskIndex(Resource):
+class HabitIndex(Resource):
     def get(self):
         user_id = get_jwt_identity()
         if user_id:
             page = request.args.get('page', 1, type=int)
             per_page = request.args.get('per_page', 10, type=int)
 
-            pagination = Task.query.filter_by(user_id=user_id).paginate(
+            pagination = Habit.query.filter_by(user_id=user_id).paginate(
                 page=page,
                 per_page=per_page,
                 error_out=False
@@ -76,7 +76,7 @@ class TaskIndex(Resource):
                 "current_page": pagination.page,
                 "next_page": pagination.next_num,
                 "prev_page": pagination.prev_num,
-                "tasks": TaskSchema(many=True).dump(pagination.items)
+                "habits": HabitSchema(many=True).dump(pagination.items)
             }, 200
         return {'error': '401 Unauthorized'}, 401
 
@@ -85,52 +85,52 @@ class TaskIndex(Resource):
         user_id = get_jwt_identity()
         if user_id:
             try:
-                task = Task(
+                habit = Habit(
                     title=request_json.get('title'),
                     content=request_json.get('content'),
                     user_id=get_jwt_identity()
                 )
-                db.session.add(task)
+                db.session.add(habit)
                 db.session.commit()
-                return TaskSchema().dump(task), 201
+                return HabitSchema().dump(habit), 201
 
             except (IntegrityError, ValueError) as e:
                 db.session.rollback()
                 return {"error": str(e)}, 422
         return {'error': '401 Unauthorized'}, 401
 
-class TaskByID(Resource):
+class HabitByID(Resource):
     def patch(self, id):
         user_id = get_jwt_identity()
-        task = Task.query.filter_by(id=id, user_id=user_id).first()
-        if not task:
-            return {"error": "Task not found"}, 404
+        habit = Habit.query.filter_by(id=id, user_id=user_id).first()
+        if not habit:
+            return {"error": "Habit not found"}, 404
 
         request_json = request.get_json()
         try:
             for attr in request_json:
-                setattr(task, attr, request_json[attr])
+                setattr(habit, attr, request_json[attr])
             db.session.commit()
-            return TaskSchema().dump(task), 200
+            return HabitSchema().dump(habit), 200
         except Exception as e:
             db.session.rollback()
             return {"error": str(e)}, 422
 
     def delete(self, id):
         user_id = get_jwt_identity()
-        task = Task.query.filter_by(id=id, user_id=user_id).first()
-        if not task:
-            return {"error": "Task not found"}, 404
+        habit = Habit.query.filter_by(id=id, user_id=user_id).first()
+        if not habit:
+            return {"error": "Habit not found"}, 404
 
-        db.session.delete(task)
+        db.session.delete(habit)
         db.session.commit()
         return {}, 204
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(WhoAmI, '/me', endpoint='me')
 api.add_resource(Login, '/login', endpoint='login')
-api.add_resource(TaskIndex, '/tasks', endpoint='tasks')
-api.add_resource(TaskByID, '/tasks/<int:id>', endpoint='task_by_id')
+api.add_resource(HabitIndex, '/habits', endpoint='habits')
+api.add_resource(HabitByID, '/habits/<int:id>', endpoint='habit_by_id')
 
 
 if __name__ == '__main__':
