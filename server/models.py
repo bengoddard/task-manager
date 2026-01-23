@@ -1,6 +1,7 @@
 from sqlalchemy.orm import validates
 from marshmallow import Schema, fields, validate
 from sqlalchemy.ext.hybrid import hybrid_property
+from datetime import date
 
 from config import db, bcrypt
 
@@ -41,18 +42,34 @@ class Habit(db.Model):
     __tablename__ = 'habits'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
-    time = db.Column(db.Integer)
+    notes = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-    user = db.relationship('User', back_populates="habits")
 
-    @validates('description')
-    def validate_instructions(self, key, description):
-        if not description:
-            raise ValueError("Description must be present.")
-        if len(description) < 50:
-            raise ValueError("Description must be at least 50 characters long.")
-        return description
+    user = db.relationship('User', back_populates="habits")
+    logs = db.relationship("Log", back_populates="habit", cascade="all, delete-orphan")
+
+    @validates('notes')
+    def validate_instructions(self, key, notes):
+        if not notes:
+            raise ValueError("Notes must be present.")
+        if len(notes) < 5:
+            raise ValueError("Notes must be at least 5 characters long.")
+        return notes
+
+
+class Log(db.Model):
+    __tablename__ = 'logs'
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False, default=date.today)
+    status = db.Column(db.Boolean, nullable=False, default=False)
+
+    habit_id = db.Column(db.Integer(), db.ForeignKey('habits.id'))
+    habit = db.relationship("Habit", back_populates="logs")
+
+    __table_args__ = (
+        db.UniqueConstraint("habit_id", "date", name="uix_habit_date"),
+    )
+
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -65,10 +82,18 @@ class UserSchema(Schema):
 class HabitSchema(Schema):
     id = fields.Int(dump_only=True)
     title = fields.Str(required=True)
-    description = fields.Str(
+    notes = fields.Str(
         required=True,
-        validate=validate.Length(min=50, error="Description must be at least 50 characters long.")
+        validate=validate.Length(min=5, error="Notes must be at least 5 characters long.")
     )
-    time = fields.Int()
     user_id = fields.Int()
     user = fields.Nested(UserSchema(exclude=("habits",)))
+
+
+class LogSchema(Schema):
+    id = fields.Int(dump_only=True)
+    date = fields.Date(required=True)
+    status = fields.Boolean(required=True)
+    habit_id = fields.Int(required=True)
+
+    habit = fields.Nested("HabitSchema", only=("id", "name"), dump_only=True)

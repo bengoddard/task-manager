@@ -46,11 +46,11 @@ with app.app_context():
     ]
     for user in users:
         for _ in range(4):
-            description = fake.paragraph(nb_sentences=8)
+            notes = fake.paragraph(nb_sentences=8)
             time = fake.random_int(min=5, max=60)
             habit = Habit(
                 title=rc(habit_titles),
-                description=description,
+                notes=notes,
                 time=time,
                 user=rc(users)
             )

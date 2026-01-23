@@ -87,7 +87,7 @@ class HabitIndex(Resource):
             try:
                 habit = Habit(
                     title=request_json.get('title'),
-                    content=request_json.get('content'),
+                    notes=request_json.get('notes'),
                     user_id=get_jwt_identity()
                 )
                 db.session.add(habit)

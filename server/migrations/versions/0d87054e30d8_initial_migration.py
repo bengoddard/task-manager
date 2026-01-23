@@ -29,7 +29,7 @@ def upgrade():
     op.create_table('habits',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
-    sa.Column('description', sa.String(), nullable=False),
+    sa.Column('notes', sa.String(), nullable=False),
     sa.Column('time', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_habits_user_id_users')),
