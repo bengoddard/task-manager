@@ -1,64 +1,111 @@
 #!/usr/bin/env python3
 
-from random import randint, choice as rc
+from datetime import date, timedelta
+import random
 
-from faker import Faker
+from config import app, db
+from models import User, Habit, Log
 
-from app import app
-from models import db, Habit, User
 
-fake = Faker()
-
-with app.app_context():
-
-    print("Deleting all records...")
+def clear_data():
+    Log.query.delete()
     Habit.query.delete()
     User.query.delete()
+    db.session.commit()
 
-    fake = Faker()
 
-    print("Creating users...")
-
+def seed_users():
     users = []
-    usernames = []
 
-    for i in range(20):
-        username = fake.first_name()
-        while username in usernames:
-            username = fake.first_name()
-        usernames.append(username)
+    u1 = User(username="ben")
+    u1.password_hash = "password123"
+    users.append(u1)
 
-        user = User(
-            username=username,
-        )
+    u2 = User(username="andy")
+    u2.password_hash = "password123"
+    users.append(u2)
 
-        user.password_hash = user.username + 'password'
-
-        users.append(user)
+    u3 = User(username="guest")
+    u3.password_hash = "password123"
+    users.append(u3)
 
     db.session.add_all(users)
+    db.session.commit()
+    return users
 
-    print("Creating habits...")
-    habits = []
-    habit_titles = [
-        "Morning Meditation", "Daily Journaling", "Exercise Routine",
-        "Read 30 Minutes", "No Social Media Before Bed"
+
+def seed_habits(users):
+    habits = [
+        Habit(
+            title="Drink Water",
+            notes="8 cups a day.",
+            frequency="daily",
+            user_id=users[0].id,
+        ),
+        Habit(
+            title="Walk",
+            notes="At least 20 minutes.",
+            frequency="daily",
+            user_id=users[0].id,
+        ),
+        Habit(
+            title="Read",
+            notes="Read 10 pages.",
+            frequency="daily",
+            user_id=users[1].id,
+        ),
+        Habit(
+            title="Gym",
+            notes="Strength training session.",
+            frequency="weekly",
+            user_id=users[1].id,
+        ),
+        Habit(
+            title="Meal Prep",
+            notes="Prep lunches for the week.",
+            frequency="weekly",
+            user_id=users[2].id,
+        ),
     ]
-    for user in users:
-        for _ in range(4):
-            notes = fake.paragraph(nb_sentences=8)
-            time = fake.random_int(min=5, max=60)
-            habit = Habit(
-                title=rc(habit_titles),
-                notes=notes,
-                time=time,
-                user=rc(users)
-            )
-
-            habit.user = rc(users)
-
-            habits.append(habit)
 
     db.session.add_all(habits)
     db.session.commit()
-    print("Complete.")
+    return habits
+
+
+def seed_logs(habits, days_back=10):
+    logs = []
+    today = date.today()
+
+    for habit in habits:
+        for i in range(days_back):
+            d = today - timedelta(days=i)
+
+            if habit.frequency == "daily":
+                status = random.random() < 0.7
+            else:
+                status = random.random() < 0.4
+
+            logs.append(Log(date=d, status=status, habit_id=habit.id))
+
+    db.session.add_all(logs)
+    db.session.commit()
+    return logs
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        print("Clearing existing data...")
+        clear_data()
+
+        print("Seeding users...")
+        users = seed_users()
+
+        print("Seeding habits...")
+        habits = seed_habits(users)
+
+        print("Seeding logs...")
+        logs = seed_logs(habits, days_back=14)
+
+        print("Done.")
+        print(f"Users: {len(users)} | Habits: {len(habits)} | Logs: {len(logs)}")

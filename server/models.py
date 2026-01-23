@@ -10,9 +10,9 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    _password_hash = db.Column(db.String)
+    _password_hash = db.Column(db.String, nullable=False)
 
-    habits = db.relationship('Habit', back_populates='user')
+    habits = db.relationship('Habit', back_populates='user', cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -43,7 +43,8 @@ class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     notes = db.Column(db.String, nullable=False)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    frequency = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
 
     user = db.relationship('User', back_populates="habits")
     logs = db.relationship("Log", back_populates="habit", cascade="all, delete-orphan")
@@ -63,7 +64,7 @@ class Log(db.Model):
     date = db.Column(db.Date, nullable=False, default=date.today)
     status = db.Column(db.Boolean, nullable=False, default=False)
 
-    habit_id = db.Column(db.Integer(), db.ForeignKey('habits.id'))
+    habit_id = db.Column(db.Integer(), db.ForeignKey('habits.id'), nullable=False)
     habit = db.relationship("Habit", back_populates="logs")
 
     __table_args__ = (
@@ -86,6 +87,7 @@ class HabitSchema(Schema):
         required=True,
         validate=validate.Length(min=5, error="Notes must be at least 5 characters long.")
     )
+    frequency = fields.Str(required=True)
     user_id = fields.Int()
     user = fields.Nested(UserSchema(exclude=("habits",)))
 
@@ -96,4 +98,4 @@ class LogSchema(Schema):
     status = fields.Boolean(required=True)
     habit_id = fields.Int(required=True)
 
-    habit = fields.Nested("HabitSchema", only=("id", "name"), dump_only=True)
+    habit = fields.Nested("HabitSchema", only=("id", "title"), dump_only=True)

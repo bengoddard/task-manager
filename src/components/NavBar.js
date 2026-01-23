@@ -15,10 +15,7 @@ function NavBar({ setUser }) {
         <Link to="/">Habit Tracker</Link>
       </Logo>
       <Nav>
-        <Button>
-          Add Habit
-        </Button>
-        <Button variant="outline" onClick={handleLogoutClick}>
+        <Button onClick={handleLogoutClick}>
           Logout
         </Button>
       </Nav>
