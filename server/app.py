@@ -4,7 +4,9 @@ from sqlalchemy.exc import IntegrityError
 from config import app, db, api, jwt
 from models import User, Habit, UserSchema, HabitSchema
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request
+from flask_cors import CORS
 
+CORS(app, resources={r"/*": {"origins": "http://localhost:4000"}}, supports_credentials=True)
 @app.before_request
 def check_if_logged_in():
     open_access_list = ['signup', 'login']
@@ -21,12 +23,10 @@ class Signup(Resource):
 
         username = request_json.get('username')
         password = request_json.get('password')
-        bio = request_json.get('bio')
 
         try:
             user = User(
             username=username,
-            bio=bio
         )
             user.password_hash = password
             db.session.add(user)

@@ -1,12 +1,13 @@
+// src/index.js
 import React from "react";
-import ReactDOM from "react-dom";
-import App from "./components/App";
+import { createRoot } from "react-dom/client";
+import App from "./components/App.js";
 import { BrowserRouter } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   *,
-  *::before, 
+  *::before,
   *::after {
     box-sizing: border-box;
   }
@@ -20,10 +21,10 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("root"));
+root.render(
   <BrowserRouter>
     <GlobalStyle />
     <App />
-  </BrowserRouter>,
-  document.getElementById("root")
+  </BrowserRouter>
 );

@@ -6,7 +6,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("/me", {
+    fetch("http://localhost:5555/me", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }

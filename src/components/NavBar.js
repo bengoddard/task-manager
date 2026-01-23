@@ -34,11 +34,11 @@ const Wrapper = styled.header`
 `;
 
 const Logo = styled.h1`
-  font-family: "Permanent Marker", cursive;
+  font-family: 'Anton', cursive;;
   font-size: 3rem;
-  color: deeppink;
-  margin: 0;
-  line-height: 1;
+  color: #1F8EFA;
+  margin: 8px 0 16px;
+
 
   a {
     color: inherit;
