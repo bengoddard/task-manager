@@ -88,7 +88,7 @@ function ProgressView({ token }) {
                     </div>
 
                     <div style={{ width: 140, alignSelf: "center" }}>
-                      <div style={{ height: 10, background: "#eee", borderRadius: 999 }}>
+                      <div style={{ height: 10, background: "#FFF500", borderRadius: 999 }}>
                         <div
                           style={{
                             height: 10,
@@ -98,7 +98,7 @@ function ProgressView({ token }) {
                               const pct = rate > 1 ? rate : rate * 100;
                               return `${Math.max(0, Math.min(100, pct))}%`;
                             })(),
-                            background: "#333",
+                            background: "#1F8EFA",
                             borderRadius: 999,
                           }}
                         />
@@ -118,7 +118,7 @@ function ProgressView({ token }) {
                               width: 14,
                               height: 14,
                               borderRadius: 4,
-                              background: day.status ? "#333" : "#ccc",
+                              background: day.status ? "#1F8EFA" : "#FFF500",
                             }}
                           />
                         ))}

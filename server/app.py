@@ -1,4 +1,4 @@
-from flask import request, session, make_response, jsonify
+from flask import request, make_response, jsonify
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from config import app, db, api, jwt
@@ -22,6 +22,8 @@ def compute_streak(habit_id):
 CORS(app, resources={r"/*": {"origins": "http://localhost:4000"}}, supports_credentials=True)
 @app.before_request
 def check_if_logged_in():
+    if request.method == "OPTIONS":
+        return make_response("", 200)
     open_access_list = ['signup', 'login']
     if request.endpoint in open_access_list:
         return
@@ -191,6 +193,68 @@ class Today(Resource):
 
         return {"date": today.isoformat(), "habits": result}, 200
 
+class Progress(Resource):
+    def get(self):
+        user_id = int(get_jwt_identity())
+
+        range_param = request.args.get("range", "week")
+        if range_param not in ["week", "month"]:
+            return {"errors": ["range must be 'week' or 'month'"]}, 422
+
+        days = 7 if range_param == "week" else 30
+        end = date.today()
+        start = end - timedelta(days=days - 1)
+
+        habits = Habit.query.filter_by(user_id=user_id).all()
+
+        per_habit = []
+        total_possible = 0
+        total_done = 0
+
+        for h in habits:
+            logs = (
+                Log.query
+                .filter(Log.habit_id == h.id)
+                .filter(Log.date >= start)
+                .filter(Log.date <= end)
+                .all()
+            )
+            log_map = {lg.date: lg.status for lg in logs}
+            history = []
+            done_count = 0
+
+            for i in range(days):
+                d = start + timedelta(days=i)
+                status = bool(log_map.get(d, False))
+                if status:
+                    done_count += 1
+                history.append({"date": d.isoformat(), "status": status})
+
+            completion_rate = (done_count / days) if days else 0
+
+            streak = compute_streak(h.id)
+
+            per_habit.append({
+                "id": h.id,
+                "title": h.title,
+                "completion_rate": completion_rate,
+                "streak": streak,
+                "history": history
+            })
+
+            total_possible += days
+            total_done += done_count
+
+        overall_rate = (total_done / total_possible) if total_possible else 0
+
+        return {
+            "range": range_param,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "completion_rate": overall_rate,
+            "habits": per_habit
+        }, 200
+
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(WhoAmI, '/me', endpoint='me')
@@ -199,6 +263,7 @@ api.add_resource(HabitIndex, '/habits', endpoint='habits')
 api.add_resource(HabitByID, '/habits/<int:id>', endpoint='habit_by_id')
 api.add_resource(HabitCheckin, "/habits/<int:id>/checkin")
 api.add_resource(Today, "/today")
+api.add_resource(Progress, "/progress", endpoint="progress")
 
 
 

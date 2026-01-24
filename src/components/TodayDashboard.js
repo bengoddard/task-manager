@@ -9,7 +9,7 @@ function TodayDashboard({ token }) {
     })
       .then((r) => r.json())
       .then(setData);
-  }, [token]);
+  }, [token, data]);
 
   function toggleHabit(habit) {
     const newStatus = !habit.completed_today;
@@ -40,7 +40,7 @@ function TodayDashboard({ token }) {
       <h2>Today ({data.date})</h2>
       <ul>
         {data?.habits?.map((h) => (
-          <li key={h.id}>
+          <li key={h.id} className="card">
             <input
               type="checkbox"
               checked={h.completed_today}

@@ -23,13 +23,14 @@ function NavBar({ setUser }) {
 
   return (
     <div style={{ display: "flex", gap: 10, padding: 12, borderBottom: "1px solid #ddd" }} className="nav">
-      <Logo>Habit Tracker</Logo>
+      <Logo className="navInner">Habit Tracker</Logo>
+      <nav className="navLinks">
       <NavLink to="/" style={linkStyle}>Today</NavLink>
       <NavLink to="/habits" style={linkStyle}>Habits</NavLink>
       <NavLink to="/progress" style={linkStyle}>Progress</NavLink>
+      </nav>
 
-
-      <div style={{ marginLeft: "auto" }}>
+      <div style={{ marginLeft: "auto" }} className="navRight">
         <Button onClick={logout}>Logout</Button>
       </div>
     </div>
@@ -41,6 +42,8 @@ const Logo = styled.h1`
   font-size: 3rem;
   color: #1F8EFA;
   margin: 8px 0 16px;
+  text-align: center;
+  justify-content: center;
 `;
 
 export default NavBar;

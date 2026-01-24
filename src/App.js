@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import NavBar from "./components/NavBar";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -10,14 +10,28 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Button } from "./styles";
 
 function App() {
+  const formRef = useRef(null);
   const token = localStorage.getItem("token");
   const [user, setUser] = useState(null);
-  const [showHabit, setShowHabit] = useState(true);
-
+  const [showForm, setShowForm] = useState(false);
   const [habits, setHabits] = useState([]);
-  const [habitsLoading, setHabitsLoading] = useState(false);
-  const [habitsErrors, setHabitsErrors] = useState([]);
   const [habitsMeta, setHabitsMeta] = useState(null);
+
+  function toggleForm() {
+    setShowForm((prev) => !prev);
+  }
+
+  useEffect(() => {
+    if (!showForm) return;
+
+    requestAnimationFrame(() => {
+      const el = formRef.current;
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top: y, behavior: "smooth" });
+    });
+  }, [showForm]);
+
 
   useEffect(() => {
     fetch("http://localhost:5555/me", {
@@ -57,6 +71,19 @@ function App() {
   });
 }, [user]);
 
+  function handleUpdated(updatedHabit) {
+    setHabits((prev) => prev.map((h) => (h.id === updatedHabit.id ? updatedHabit : h)));
+  }
+
+  function handleDeleted(deletedId) {
+    setHabits((prev) => prev.filter((h) => h.id !== deletedId));
+  }
+
+  function handleHabitCreated(newHabit) {
+    setHabits((prev) => [newHabit, ...prev]);
+    setShowForm(false);
+  }
+
   if (!user) return <Login onLogin={onLogin} />;
 
     if (!user) {
@@ -70,22 +97,23 @@ function App() {
     }
     return (
       <>
-      {showHabit && (
-        <HabitForm
-          token={localStorage.getItem("token")}
-          onHabitCreated={(newHabit) => setHabits((prev) => [newHabit, ...prev])}
-        />
-      )}
       <NavBar setUser={setUser} />
+      <Button onClick={toggleForm}>
+        {showForm ? "Hide Habit Form" : "Add a Habit"}
+      </Button>
       <Routes>
         <Route path="/" element={<TodayDashboard token={token} />} />
-        <Route path="/habits" element={<HabitList token={token} />} />
+        <Route path="/habits" element={<HabitList token={token} habits={habits} onUpdated={handleUpdated} onDeleted={handleDeleted}/>} />
         <Route path="/progress" element={<ProgressView token={token} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Button onClick={() => setShowHabit((s) => !s)}>
-        {showHabit ? "Hide Habit Form" : "Add a Habit"}
-      </Button>
+      <div ref={formRef}>
+      {showForm && (
+        <HabitForm
+          token={token}
+          onHabitCreated={handleHabitCreated}/>
+      )}
+      </div>
       </>
     );
 }

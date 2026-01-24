@@ -50,7 +50,7 @@ a { color: inherit; }
 }
 
 .card {
-  background: var(--card);
+  background: #111827;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -115,7 +115,7 @@ a { color: inherit; }
   font-weight: 700;
   margin-bottom: 6px;
   display: inline-block;
-  color: var(--text);
+  color: #F9FAFB;
 }
 
 .formGrid {
@@ -137,7 +137,8 @@ a { color: inherit; }
   position: sticky;
   top: 0;
   background: #0F172A;
-  backdrop-filter: blur(10px);
+  z-index: 10;
+  backdrop-filter: none;
 }
 
 .navInner {
