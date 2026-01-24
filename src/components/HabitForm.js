@@ -41,7 +41,7 @@ function HabitForm({ token, onHabitCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="container">
       <FormField>
         <Label htmlFor="title">Habit Name</Label>
         <Input
@@ -63,7 +63,6 @@ function HabitForm({ token, onHabitCreated }) {
           style={{ width: "100%", padding: "8px" }}
         >
           <option value="daily">Daily</option>
-          <option value="3xWeek">3x a Week</option>
           <option value="weekly">Weekly</option>
         </select>
       </FormField>
