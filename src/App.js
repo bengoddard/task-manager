@@ -98,15 +98,15 @@ function App() {
     return (
       <>
       <NavBar setUser={setUser} />
-      <Button onClick={toggleForm}>
-        {showForm ? "Hide Habit Form" : "Add a Habit"}
-      </Button>
       <Routes>
         <Route path="/" element={<TodayDashboard token={token} />} />
         <Route path="/habits" element={<HabitList token={token} habits={habits} onUpdated={handleUpdated} onDeleted={handleDeleted}/>} />
         <Route path="/progress" element={<ProgressView token={token} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Button onClick={toggleForm}>
+        {showForm ? "Hide Habit Form" : "Add a Habit"}
+      </Button>
       <div ref={formRef}>
       {showForm && (
         <HabitForm
