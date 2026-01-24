@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HabitCard from "./HabitCard";
+import { Button } from "../styles";
 
 function HabitList({ token, refreshKey, onHabitsLoaded }) {
   const [habits, setHabits] = useState([]);
@@ -47,7 +48,7 @@ function HabitList({ token, refreshKey, onHabitsLoaded }) {
     return (
       <div>
         <p style={{ color: "crimson" }}>{errors[0]}</p>
-        <button onClick={loadHabits}>Try again</button>
+        <Button onClick={loadHabits}>Try again</Button>
       </div>
     );
   }

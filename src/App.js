@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "./components/NavBar";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import TodayDashboard from "./components/TodayDashboard";
+import ProgressView from "./components/ProgressView";
+import HabitList from "./components/HabitList";
 import HabitForm from "./components/HabitForm";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Button } from "./styles";
 
 function App() {
+  const token = localStorage.getItem("token");
   const [user, setUser] = useState(null);
   const [showHabit, setShowHabit] = useState(true);
 
@@ -53,47 +59,35 @@ function App() {
 
   if (!user) return <Login onLogin={onLogin} />;
 
-  return (
-    <>
-      <NavBar setUser={setUser} />
-      <Button onClick={() => setShowHabit((s) => !s)}>
-        {showHabit ? "Hide Habit Form" : "Add a Habit"}
-      </Button>
-
+    if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login onLogin={onLogin} />} />
+        <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+    }
+    return (
+      <>
       {showHabit && (
         <HabitForm
           token={localStorage.getItem("token")}
           onHabitCreated={(newHabit) => setHabits((prev) => [newHabit, ...prev])}
         />
       )}
-
-      <hr />
-
-      <h2>Your Habits</h2>
-
-      {habitsLoading ? (
-        <p>Loading habits...</p>
-      ) : habitsErrors.length > 0 ? (
-        <ul>
-          {habitsErrors.map((e) => (
-            <li key={e}>{e}</li>
-          ))}
-        </ul>
-      ) : habits.length === 0 ? (
-        <p>No habits yet. Create one above!</p>
-      ) : (
-        <ul>
-          {habits.map((habit) => (
-            <li key={habit.id}>
-              <strong>{habit.name}</strong>
-              {habit.frequency ? ` • ${habit.frequency}` : null}
-              {habit.goal ? ` • goal: ${habit.goal}` : null}
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
-  );
+      <NavBar setUser={setUser} />
+      <Routes>
+        <Route path="/" element={<TodayDashboard token={token} />} />
+        <Route path="/habits" element={<HabitList token={token} />} />
+        <Route path="/progress" element={<ProgressView token={token} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Button onClick={() => setShowHabit((s) => !s)}>
+        {showHabit ? "Hide Habit Form" : "Add a Habit"}
+      </Button>
+      </>
+    );
 }
 
 export default App;

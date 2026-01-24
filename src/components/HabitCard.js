@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../styles";
 
 function HabitCard({ habit, token, onUpdated, onDeleted }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -74,7 +75,7 @@ function HabitCard({ habit, token, onUpdated, onDeleted }) {
   }
 
   return (
-    <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 12 }}>
+    <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 12 }} className="card">
       {!isEditing ? (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
@@ -87,12 +88,12 @@ function HabitCard({ habit, token, onUpdated, onDeleted }) {
             </div>
 
             <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-              <button onClick={() => setIsEditing(true)} disabled={isSaving}>
+              <Button onClick={() => setIsEditing(true)} disabled={isSaving}>
                 Edit
-              </button>
-              <button onClick={deleteHabit} disabled={isSaving}>
+              </Button>
+              <Button onClick={deleteHabit} disabled={isSaving}>
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -135,12 +136,12 @@ function HabitCard({ habit, token, onUpdated, onDeleted }) {
           </div>
 
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button onClick={saveEdits} disabled={isSaving}>
+            <Button onClick={saveEdits} disabled={isSaving}>
               {isSaving ? "Saving..." : "Save"}
-            </button>
-            <button onClick={cancelEdit} disabled={isSaving}>
+            </Button>
+            <Button onClick={cancelEdit} disabled={isSaving}>
               Cancel
-            </button>
+            </Button>
           </div>
 
           {error ? <p style={{ color: "crimson", marginTop: 10 }}>{error}</p> : null}

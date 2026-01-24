@@ -48,7 +48,7 @@ function ProgressView({ token }) {
   if (loading) return <p>Loading progress...</p>;
 
   return (
-    <div style={{ marginTop: 16 }}>
+    <div style={{ marginTop: 16 }} className="container">
       <h2>Progress</h2>
 
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>

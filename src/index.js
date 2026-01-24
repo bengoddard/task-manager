@@ -1,9 +1,10 @@
 // src/index.js
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "./components/App.js";
+import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
+import "./index.css";
 
 const GlobalStyle = createGlobalStyle`
   *,

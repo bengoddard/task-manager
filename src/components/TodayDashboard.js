@@ -36,10 +36,10 @@ function TodayDashboard({ token }) {
   if (!data) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="container">
       <h2>Today ({data.date})</h2>
       <ul>
-        {data.habits.map((h) => (
+        {data?.habits?.map((h) => (
           <li key={h.id}>
             <input
               type="checkbox"

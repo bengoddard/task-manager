@@ -41,7 +41,7 @@ function HabitForm({ token, onHabitCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="container">
       <FormField>
         <Label htmlFor="title">Habit Name</Label>
         <Input
