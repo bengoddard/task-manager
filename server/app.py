@@ -54,10 +54,10 @@ class Signup(Resource):
 class WhoAmI(Resource):
     def get(self):
         user_id = get_jwt_identity()
-        if user_id:
-            user = User.query.filter(User.id == user_id).first()
-            return UserSchema().dump(user), 200
-        return {"error": "Unauthorized"}, 401
+        user = User.query.get(int(user_id))
+        if not user:
+            return {"error": "User not found"}, 404
+        return UserSchema().dump(user), 200
 
 class Login(Resource):
     def post(self):

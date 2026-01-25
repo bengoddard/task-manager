@@ -41,9 +41,10 @@ function App() {
     }).then((r) => {
       if (r.ok) {
         r.json().then((user) => setUser(user));
+        console.log(user);
       }
     });
-  }, []);
+  }, [token]);
 
   const onLogin = (token, user) => {
     localStorage.setItem("token", token);

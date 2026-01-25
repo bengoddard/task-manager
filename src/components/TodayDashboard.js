@@ -9,7 +9,7 @@ function TodayDashboard({ token }) {
     })
       .then((r) => r.json())
       .then(setData);
-  }, [token, data]);
+  }, [token]);
 
   function toggleHabit(habit) {
     const newStatus = !habit.completed_today;
